@@ -64,14 +64,19 @@ export default function App() {
     });
   };
 
+  const compareSignExpresion = (expression, sign) =>{
+    const lastelement = expression?.slice(-1);
+    
+    let reg = new RegExp('^[0-9]$');
+    const result =  (lastelement === '+' || lastelement === '-' || lastelement === 'X' || lastelement === '/') ? (expression.slice(0, -1 ) + sign) : expression + sign
+    return result;
+  }
+
   const signClickHandler = (e) => {
-    const lastelement = calc.expression?.slice(-1);
+    
     setCalc({
       ...calc,
-      expression:
-        lastelement !== e.target.innerHTML
-          ? calc.expression + e.target.innerHTML
-          : calc.expression,
+      expression: compareSignExpresion(calc.expression, e.target.innerHTML),
       sign: e.target.innerHTML,
       res: !calc.num
         ? calc.res
@@ -112,7 +117,7 @@ export default function App() {
   const invertClickHandler = () => {
     setCalc({
       ...calc,
-      expression: calc.expression + "+-",
+      expression: calc.expression + "(+-)",
       num: calc.num ? toLocaleString(removeSpaces(calc.num) * -1) : 0,
       res: calc.res ? toLocaleString(removeSpaces(calc.res) * -1) : 0,
       sign: "",
@@ -124,7 +129,7 @@ export default function App() {
     let res = calc.res ? parseFloat(removeSpaces(calc.res)) : 0;
     setCalc({
       ...calc,
-      expression: calc.expression + "%",
+      expression: compareSignExpresion(calc.expression, "%"),
       num: (num * 10 ** 16) / 10 ** 18,
       res: (res * 10 ** 16) / 10 ** 18,
       sign: "",
@@ -147,12 +152,19 @@ export default function App() {
       : numClickHandler(e);
   };
 
+  const removeBrackers =(express) =>{
+
+    express = express.replace('(', '');
+    express = express.replace(')', '');
+
+    return express;
+  }
   return (
     <>
       <Wrapper>
         <Screen
           value={calc.num ? calc.num : calc.res}
-          expression={calc.expression}
+          expression={removeBrackers(calc.expression) }
         />
         <ButtonBox>
           {btnValues.flat().map((btn, i) => {
